@@ -1,0 +1,4 @@
+/.idea/
+.env
+identifier.sqlite
+scheduler.db
