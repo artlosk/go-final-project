@@ -1,11 +1,12 @@
-package handlers
+package helpers
 
 import (
 	"encoding/json"
 	"net/http"
 )
 
-func writeJSON(w http.ResponseWriter, data any) {
+func WriteJSON(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(data)
 }

@@ -58,6 +58,9 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		if err != nil {
 			return "", err
 		}
+		if !AfterNow(date, nowDay) {
+			date = nowDay.AddDate(0, 0, 1)
+		}
 		for i := 0; i < 800; i++ {
 			if AfterNow(date, nowDay) && week[convertWeekDay(date)] {
 				return date.Format(DateLayout), nil
@@ -82,6 +85,9 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 			for m := 1; m <= 12; m++ {
 				monthMask[m] = true
 			}
+		}
+		if !AfterNow(date, nowDay) {
+			date = nowDay.AddDate(0, 0, 1)
 		}
 		for i := 0; i < 800; i++ {
 			if !monthMask[int(date.Month())] {
