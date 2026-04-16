@@ -1,0 +1,14 @@
+services:
+  app:
+    image: golang:1.25
+    container_name: app
+    working_dir: /app
+    environment:
+      TODO_PORT: "${TODO_PORT:-7540}"
+      TODO_DBFILE: "/app/data/scheduler.db"
+      TODO_PASSWORD: "${TODO_PASSWORD:-}"
+    volumes:
+      - .:/app
+    ports:
+      - "${TODO_PORT:-7540}:${TODO_PORT:-7540}"
+    entrypoint: ["/bin/bash", "-lc", "/usr/local/go/bin/go run ./cmd & tail -f /dev/null"]
