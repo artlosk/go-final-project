@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"go-final-project/internal/schedule"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -26,5 +27,7 @@ func NextHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	_, _ = w.Write([]byte(next))
+	if _, err := w.Write([]byte(next)); err != nil {
+		log.Printf("next handler write failed: %v", err)
+	}
 }

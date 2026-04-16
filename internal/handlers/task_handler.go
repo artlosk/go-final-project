@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go-final-project/internal/db"
 	"go-final-project/internal/helpers"
@@ -13,6 +14,14 @@ import (
 
 type TasksResp struct {
 	Tasks []*db.Task `json:"tasks"`
+}
+
+func writeDBError(w http.ResponseWriter, err error) {
+	if errors.Is(err, db.ErrTaskNotFound) {
+		helpers.WriteJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		return
+	}
+	helpers.WriteJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 }
 
 func TaskHandler(w http.ResponseWriter, r *http.Request) {
@@ -51,13 +60,13 @@ func TaskDoneHandler(w http.ResponseWriter, r *http.Request) {
 
 	task, err := db.GetTask(id)
 	if err != nil {
-		helpers.WriteJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		writeDBError(w, err)
 		return
 	}
 
 	if task.Repeat == "" {
 		if err := db.DeleteTask(id); err != nil {
-			helpers.WriteJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+			writeDBError(w, err)
 			return
 		}
 		helpers.WriteJSON(w, http.StatusOK, map[string]string{})
@@ -71,7 +80,7 @@ func TaskDoneHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.UpdateDate(next, id); err != nil {
-		helpers.WriteJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		writeDBError(w, err)
 		return
 	}
 
@@ -87,7 +96,7 @@ func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	task, err := db.GetTask(id)
 	if err != nil {
-		helpers.WriteJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		writeDBError(w, err)
 		return
 	}
 
@@ -145,7 +154,7 @@ func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := db.UpdateTask(&task); err != nil {
-		helpers.WriteJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		writeDBError(w, err)
 		return
 	}
 	helpers.WriteJSON(w, http.StatusOK, map[string]string{})
@@ -159,7 +168,7 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.DeleteTask(id); err != nil {
-		helpers.WriteJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		writeDBError(w, err)
 		return
 	}
 
